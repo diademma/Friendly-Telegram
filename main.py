@@ -1,17 +1,19 @@
-import os
 from telethon import TelegramClient, events
+import os
 
-# Данные берём из Railway (Variables)
-api_id = int(os.environ["API_ID"])
-api_hash = os.environ["API_HASH"]
-session = os.environ.get("SESSION", "anon")
+# Берём данные из переменных окружения Railway
+API_ID = int(os.environ.get("API_ID"))
+API_HASH = os.environ.get("API_HASH")
+SESSION = os.environ.get("SESSION"))  # строка-сессия
 
-client = TelegramClient(session, api_id, api_hash)
+# Создаём клиента
+client = TelegramClient(StringSession(SESSION), API_ID, API_HASH)
 
-@client.on(events.NewMessage(pattern="!привет"))
+# Событие: когда пишешь ".ping", бот отвечает "pong"
+@client.on(events.NewMessage(pattern=r"\.ping"))
 async def handler(event):
-    await event.respond("Привет! Я твой юзербот 🚀")
+    await event.reply("pong 🏓")
 
-print("Юзербот запущен...")
+print("Бот запущен!")
 client.start()
 client.run_until_disconnected()
