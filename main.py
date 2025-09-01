@@ -86,10 +86,11 @@ client = TelegramClient(StringSession(SESSION), API_ID, API_HASH)
 @client.on(events.NewMessage(chats=CHANNELS))
 async def handle_new_message(event):
     """Handles new messages with media."""
-    if event.media and event.media.document:
+    # Check if the message contains any media, and if that media has a 'document' attribute.
+    if event.media and hasattr(event.media, 'document'):
         file_size_mb = event.media.document.size / (1024 * 1024)
         
-        # Safely get file name
+        # Safely get file name using getattr
         file_name = getattr(event.media.document, 'filename', 'unknown_file')
         
         logging.info(f"New media message detected. File: {file_name}, Size: {file_size_mb:.2f} MB")
@@ -98,7 +99,7 @@ async def handle_new_message(event):
             logging.info(f"File size is within the limit. Downloading {file_name}...")
             
             try:
-                file_path = await client.download_media(event.media, file_name=file_name)
+                file_path = await client.download_media(event.media)
                 
                 subject = f"Telegram Media Forward: {file_name}"
                 body = f"The following media file was forwarded from Telegram:\n\nFile Name: {file_name}\nFile Size: {file_size_mb:.2f} MB"
