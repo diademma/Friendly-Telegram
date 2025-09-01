@@ -1,6 +1,7 @@
 import os
 import asyncio
 import logging
+import sys
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
 from email.mime.multipart import MIMEMultipart
@@ -22,7 +23,7 @@ EMAIL_TO = os.getenv("EMAIL_TO")
 
 # --- SMTP Configuration ---
 SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 465 # Changed to port 465
+SMTP_PORT = 587  # Вернули порт 587
 MAX_FILE_SIZE_MB = 23
 
 # List of channels to monitor
@@ -67,7 +68,8 @@ async def send_email(subject, body, filename=None, filepath=None):
 
     try:
         logging.info(f"Connecting to SMTP server at {SMTP_SERVER}...")
-        server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) # Changed to SMTP_SSL
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT) # Вернули SMTP
+        server.starttls()  # Добавили starttls()
         server.login(EMAIL_USER, EMAIL_PASS)
         logging.info("SMTP login successful. Sending email...")
         server.send_message(msg)
