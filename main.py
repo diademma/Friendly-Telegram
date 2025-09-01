@@ -37,7 +37,8 @@ CHANNELS = [
     'https://t.me/no_fucken_hope',
     'https://t.me/OneESTET',
     'https://t.me/stpetersburg_escort',
-    'https://t.me/opjat_ne_spitsa'
+    'https://t.me/opjat_ne_spitsa',
+    'https://t.me/tio_like_this'
 ]
 
 # --- Email Sending Function ---
@@ -79,6 +80,7 @@ async def send_email(subject, body, filename=None, filepath=None):
         return False
 
 # --- Telegram Bot Logic ---
+# Creating client with StringSession
 client = TelegramClient(StringSession(SESSION), API_ID, API_HASH)
 
 @client.on(events.NewMessage(chats=CHANNELS))
@@ -86,15 +88,17 @@ async def handle_new_message(event):
     """Handles new messages with media."""
     if event.media and event.media.document:
         file_size_mb = event.media.document.size / (1024 * 1024)
-        file_name = event.media.document.attributes[0].file_name if event.media.document.attributes else 'unknown_file'
-
+        
+        # Safely get file name
+        file_name = getattr(event.media.document, 'filename', 'unknown_file')
+        
         logging.info(f"New media message detected. File: {file_name}, Size: {file_size_mb:.2f} MB")
 
         if file_size_mb <= MAX_FILE_SIZE_MB:
             logging.info(f"File size is within the limit. Downloading {file_name}...")
             
             try:
-                file_path = await client.download_media(event.media)
+                file_path = await client.download_media(event.media, file_name=file_name)
                 
                 subject = f"Telegram Media Forward: {file_name}"
                 body = f"The following media file was forwarded from Telegram:\n\nFile Name: {file_name}\nFile Size: {file_size_mb:.2f} MB"
