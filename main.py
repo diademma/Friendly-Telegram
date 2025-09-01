@@ -30,7 +30,7 @@ CHANNELS = [
     'https://t.me/foma_sinitsaa',
     'https://t.me/FunWednesday',
     'https://t.me/rand2ch',
-    'https://tme/MemDoze',
+    'https://t.me/MemDoze',
     'https://t.me/spotsonthesuns',
     'https://t.me/luka_lisitsa',
     'https://t.me/nononopleaseno',
