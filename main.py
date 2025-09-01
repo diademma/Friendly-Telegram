@@ -22,7 +22,7 @@ EMAIL_TO = os.getenv("EMAIL_TO")
 
 # --- SMTP Configuration ---
 SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 587
+SMTP_PORT = 465 # Changed to port 465
 MAX_FILE_SIZE_MB = 23
 
 # List of channels to monitor
@@ -30,7 +30,7 @@ CHANNELS = [
     'https://t.me/foma_sinitsaa',
     'https://t.me/FunWednesday',
     'https://t.me/rand2ch',
-    'https://t.me/MemDoze',
+    'https://tme/MemDoze',
     'https://t.me/spotsonthesuns',
     'https://t.me/luka_lisitsa',
     'https://t.me/nononopleaseno',
@@ -67,8 +67,7 @@ async def send_email(subject, body, filename=None, filepath=None):
 
     try:
         logging.info(f"Connecting to SMTP server at {SMTP_SERVER}...")
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-        server.starttls()
+        server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) # Changed to SMTP_SSL
         server.login(EMAIL_USER, EMAIL_PASS)
         logging.info("SMTP login successful. Sending email...")
         server.send_message(msg)
@@ -80,17 +79,12 @@ async def send_email(subject, body, filename=None, filepath=None):
         return False
 
 # --- Telegram Bot Logic ---
-# Creating client with StringSession
 client = TelegramClient(StringSession(SESSION), API_ID, API_HASH)
 
 @client.on(events.NewMessage(chats=CHANNELS))
 async def handle_new_message(event):
-    """Handles new messages with media."""
-    # Check if the message contains any media, and if that media has a 'document' attribute.
     if event.media and hasattr(event.media, 'document'):
         file_size_mb = event.media.document.size / (1024 * 1024)
-        
-        # Safely get file name using getattr
         file_name = getattr(event.media.document, 'filename', 'unknown_file')
         
         logging.info(f"New media message detected. File: {file_name}, Size: {file_size_mb:.2f} MB")
@@ -119,7 +113,6 @@ async def handle_new_message(event):
 
 # --- Main Logic ---
 async def main():
-    """Main function to run the bot."""
     if not all([API_ID, API_HASH, SESSION, EMAIL_USER, EMAIL_PASS, EMAIL_TO]):
         logging.error("One or more environment variables are missing. Please check your Railway configuration.")
         return
